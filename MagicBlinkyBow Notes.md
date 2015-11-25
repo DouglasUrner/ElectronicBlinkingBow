@@ -28,6 +28,8 @@ This sounds like the bow is basically a variation on a guitar tuner. Here are so
 * http://www.tonychai.com/guitar.html
 * http://deambulatorymatrix.blogspot.com/2010/11/digital-chromatic-guitar-tuner-2008.html
 
+Adafruit has a project they call [Piccolo Music Visualizer](https://learn.adafruit.com/piccolo) which also seems like a possible source of ideas / inspiration. They describe it as a "spectrum analyzer, "but not a "precision scientific instrument" – hence the term "visualizer."
+
 Work by Amanda Ghassaei on Arudino based signal processing:
 
 * http://www.instructables.com/id/Arduino-Audio-Input
