@@ -1,3 +1,4 @@
+#include <RunningMedian.h>
 #include <Adafruit_NeoPixel.h>
 
 //generalized wave freq detection with 38.5kHz sampling rate and interrupts
@@ -15,6 +16,7 @@
 
 
 #define LOG_LENGTH 3
+
 //clipping indicator variables
 boolean clipping = 0;
 
@@ -27,8 +29,8 @@ int slope[10];//storage for slope of events
 unsigned int totalTimer;//used to calculate period
 unsigned int period;//storage for period of wave
 byte index = 0;//current storage index
-RunningMedian inputFreqs(LOG_LENGTH);//storage for frequency calculations
-float previousFreq[3]; //making data make more sense
+float inputFreq;//storage for frequency calculations
+RunningMedian freqMedian(LOG_LENGTH); //making data make more sense
 int maxSlope = 0;//used to calculate max slope as trigger point
 int newSlope;//storage for incoming slope data
 
@@ -163,10 +165,10 @@ void loop(){
   if (checkMaxAmp>ampThreshold){
     inputFreq = 38462/float(period);//calculate frequency timer rate/period
 
-    
+    freqMedian.add(inputFreq);
   
     //print results
-    Serial.print(frequency);
+    Serial.print(freqMedian.getMedian());
     Serial.println(" hz");
   }
   
