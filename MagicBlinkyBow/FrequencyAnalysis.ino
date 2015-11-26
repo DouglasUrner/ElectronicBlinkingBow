@@ -1,20 +1,3 @@
-#include <RunningMedian.h>
-#include <Adafruit_NeoPixel.h>
-
-//generalized wave freq detection with 38.5kHz sampling rate and interrupts
-//by Amanda Ghassaei
-//http://www.instructables.com/id/Arduino-Frequency-Detection/
-//Sept 2012
-
-/*
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- *
-*/
-
-
 #define LOG_LENGTH 3
 
 //clipping indicator variables
@@ -45,8 +28,9 @@ byte maxAmp = 0;
 byte checkMaxAmp;
 byte ampThreshold = 30;//raise if you have a very noisy signal
 
-void setup(){
-  
+int delayval = 500; // delay for half a second
+
+void freqSetup() {
   Serial.begin(9600);
   
   pinMode(13,OUTPUT);//led indicator pin
@@ -143,6 +127,9 @@ ISR(ADC_vect) {//when new ADC value ready
   
 }
 
+
+
+
 void reset(){//clea out some variables
   index = 0;//reset index
   noMatch = 0;//reset match couner
@@ -157,9 +144,7 @@ void checkClipping(){//manage clipping indicator LED
   }
 }
 
-
-void loop(){
-  
+void processFrequency(){
   checkClipping();
   
   if (checkMaxAmp>ampThreshold){
@@ -167,15 +152,11 @@ void loop(){
 
     freqMedian.add(inputFreq);
   
-    //print results
     Serial.print(freqMedian.getMedian());
     Serial.println(" hz");
+
+    handleFrequency(freqMedian.getMedian());
+  } else {
+    handleStop();
   }
-  
-  delay(100);//delete this if you want
-  
-  //do other stuff here
 }
-
-
-
