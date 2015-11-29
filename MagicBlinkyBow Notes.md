@@ -16,6 +16,8 @@ The tonal range of the violin is about four octaves, the low string is a G at 19
 
 [HSL, HSB and HSV color: differences and conversion](http://codeitdown.com/hsl-hsb-hsv-color/)
 
+[Pitch to Color Converter](http://www.flutopedia.com/sound_color.htm)
+
 ## Ideas for the display
 
 One way to map notes onto colors is to start with the audible frequency range and keep moving up by octaves until you reach visible frequencies. This mapping, from [A mapping between musical notes and colors](http://www.endolith.com/wordpress/2010/09/15/a-mapping-between-musical-notes-and-colors/), is in the table below. Note that the entire visible spectrum is about one octave. The violin, by comparison, has a range of about five octaves.
@@ -202,6 +204,17 @@ Work by Amanda Ghassaei on Arudino based signal processing:
 
 * http://www.instructables.com/id/Arduino-Audio-Input
 * http://www.instructables.com/id/Arduino-Frequency-Detection
+
+## Hardware Specs
+
+### ATtiny85
+
+RAM: 512 bytes
+Flash: 8K (less 2.75K for bootloader leaves about 5.25 KB for user code)
+EEPROM: 512 bytes
+
+5V clock: 16 MHz
+3.3V clock 8 MHz
 
 ## Tasks
 
