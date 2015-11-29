@@ -6,7 +6,7 @@ Violin bow with a microphone and LEDs hooked to an Arduino (actually a Trinket) 
 
 The code design tries to expose some fun options so that a user of the bow might have some motivation to learn about about programming (or hacking hardware).
 
-The tonal range of the violin is about four octaves, the low string is a G at 196 Hz, the open strings go up by fifths to E – G3 (196.0 Hz), D4 (293.7 Hz), A4 (440.0 Hz), E5 (659.3 Hz). The highest note on the E string is about 10 KHz. From http://hyperphysics.phy-astr.gsu.edu/hbase/music/violin.html
+The tonal range of the violin is about four octaves, the low string is a G at 196 Hz, the open strings go up by fifths to E – G3 (196.0 Hz), D4 (293.7 Hz), A4 (440.0 Hz), E5 (659.3 Hz). According to [Wikipedia](https://en.wikipedia.org/wiki/Violin) the highest practical note on the E string is E7 (2637 Hz), although http://hyperphysics.phy-astr.gsu.edu/hbase/music/violin.html claims a high note of around 10 KHz. For our purposes E7 seems like a reasonable target on the high end. This means that we need a sampling frequency of around 5275 Hz.
 
 [List of notes and their frequencies](http://www.liutaiomottola.com/formulae/freqtab.htm).
 
