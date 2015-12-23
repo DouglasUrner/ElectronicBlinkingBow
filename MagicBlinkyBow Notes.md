@@ -6,25 +6,59 @@ Violin bow with a microphone and LEDs hooked to an Arduino (actually a Trinket) 
 
 The code design tries to expose some fun options so that a user of the bow might have some motivation to learn about about programming (or hacking hardware).
 
-The tonal range of the violin is about four octaves, the low string is a G at 196 Hz, the open strings go up by fifths to E – G3 (196.0 Hz), D4 (293.7 Hz), A4 (440.0 Hz), E5 (659.3 Hz). According to [Wikipedia](https://en.wikipedia.org/wiki/Violin) the highest practical note on the E string is E7 (2637 Hz), although http://hyperphysics.phy-astr.gsu.edu/hbase/music/violin.html claims a high note of around 10 KHz. For our purposes E7 seems like a reasonable target on the high end. This means that we need a sampling frequency of around 5275 Hz.
+The tonal range of the violin is about four octaves, the low string is a G at 196 Hz, the open strings go up by fifths to E – G3 (196.0 Hz), D4 (293.7 Hz), A4 (440.0 Hz), E5 (659.3 Hz). The highest note on the E string is about 10 KHz. From http://hyperphysics.phy-astr.gsu.edu/hbase/music/violin.html
 
-[List of notes and their frequencies](http://www.liutaiomottola.com/formulae/freqtab.htm).
+According to [Wikipedia](https://en.wikipedia.org/wiki/Violin#Pitch_range):
 
-[Another list of notes](http://www.phy.mtu.edu/~suits/notefreqs.html).
+>The lowest note of a violin, tuned normally, is G3, or G below middle C. (On rare occasions, the lowest string may be tuned down by as much as a fourth, to D3.) The highest note is less well defined: E7, the E two octaves above the open string (which is tuned to E5) may be considered a practical limit for orchestral violin parts, but it is often possible to play higher, depending on the length of the fingerboard and the skill of the violinist. Yet higher notes (up to C8) can be sounded using harmonics, either natural or artificial.
 
-[Light wavelengths and colors](http://hyperphysics.phy-astr.gsu.edu/hbase/vision/specol.html).
+E7 is 2637 Hz.
 
-[HSL, HSB and HSV color: differences and conversion](http://codeitdown.com/hsl-hsb-hsv-color/)
+http://www.phy.mtu.edu/~suits/notefreqs.html
 
-[Pitch to Color Converter](http://www.flutopedia.com/sound_color.htm)
+http://www.liutaiomottola.com/formulae/freqtab.htm
+
+## Signal processing
+
+Filter out signals we don't want to, can't handle. Otherwise we will still them as spurious (aliased) input.
+
+Nyquist says 2x desired frequency. Filter comes in slowly so need to sample higher than the actual frequency of interest. Instruments have lots of harmonics.
+
+### Zero Crossing Detection
+
+Work by Amanda Ghassaei on Arudino based signal processing:
+
+* http://www.instructables.com/id/Arduino-Audio-Input
+* http://www.instructables.com/id/Arduino-Frequency-Detection
+
+### FFT
+
+Bins limit resolution (and memory limits bins)
+
+* [FFT Library](http://forum.arduino.cc/index.php?topic=299461.0) - discussion about similar project trying to use the [fix_FFT library](http://forum.arduino.cc/index.php?topic=38153.0) – 8-bit, fixed point in-place FFT.
+
+* [Open Music Labs Arduino FFT Library](http://wiki.openmusiclabs.com/wiki/ArduinoFFT), not sure if it will work with 1.6.
+
+Lots of good looking stuff here: http://www.arduinoos.com/projects/
+
+### FHT
+
+Alternative to FFT, Open Music Labs has an implementation.
+
+### Auto Correlation
+
+* [Reliable Frequency Measurment Using Autocorrelation](http://forum.arduino.cc/index.php?topic=195085.0)
+* http://www.instructables.com/id/Reliable-Frequency-Detection-Using-DSP-Techniques/
 
 ## Ideas for the display
 
-One way to map notes onto colors is to start with the audible frequency range and keep moving up by octaves until you reach visible frequencies. This mapping, from [A mapping between musical notes and colors](http://www.endolith.com/wordpress/2010/09/15/a-mapping-between-musical-notes-and-colors/), is in the table below. Note that the entire visible spectrum is about one octave. The violin, by comparison, has a range of about five octaves.
+Use HSV for color. Then map as:
 
-The author of the referenced article adds:
+* Hue: Note (A, B, C, etc.).
+* Saturation: Octave
+* Value/Brightness: Volume?
 
->I used [this Python code]() to generate the RGB values for each wavelength, and Wolfram Alpha to find the nearest named HTML color.  Should find the nearest color names from the [XKCD color survey](https://xkcd.com/color/rgb/) instead (and “nearest” should be defined as distance in L*a*b* space, not in RGB space).
+A number of people have tried to find [_A Mapping Between Musical Notes and Colors_](http://www.endolith.com/wordpress/2010/09/15/a-mapping-between-musical-notes-and-colors) – in this one, the mapping is achieved by moving up from sound frequencies by octaves until you get into the range of light. Note that people hear several octaves of sound, but ony see about one "octave" of light. This means that we need another method of encoding octaves visually.
 
 <table border="1" cellspacing="0">
 <tbody>
@@ -174,11 +208,7 @@ The author of the referenced article adds:
 </tbody>
 </table>
 
-Since there is only one "octave" of visible light, and many octaves of notes on the violin, we need a way to encode octaves. Saturation seems like a possible way to do this.
-
-Here is [another approach to the problem](http://www.gootar.com/theory.htm) – the author claims that major chords are primary colors, but s/he is talking about subtractive primaries rather than additive, so I'm not so sure about this…
-
-### Other display ideas
+### Other Ideas
 
 * LED for each step on the scale, color by octave (sharps & flats?)
 * LED for each string (how to distinguish alternative notes?)
@@ -198,23 +228,15 @@ This sounds like the bow is basically a variation on a guitar tuner. Here are so
 * http://www.tonychai.com/guitar.html
 * http://deambulatorymatrix.blogspot.com/2010/11/digital-chromatic-guitar-tuner-2008.html
 
-Adafruit has a project they call [Piccolo Music Visualizer](https://learn.adafruit.com/piccolo) which also seems like a possible source of ideas / inspiration. They describe it as a "spectrum analyzer, "but not a "precision scientific instrument" – hence the term "visualizer."
+Adafruit has a project they call [Piccolo Music Visualizer](https://learn.adafruit.com/piccolo) which also seems like a possible source of ideas / inspiration. They describe it as a "spectrum analyzer, "but not a "precision scientific instrument" – hence the term "visualizer." This uses an Arduino Teensy which is a much bigger machine than the "standard" Arduino or the Trinket.
 
-Work by Amanda Ghassaei on Arudino based signal processing:
+## Libraries
 
-* http://www.instructables.com/id/Arduino-Audio-Input
-* http://www.instructables.com/id/Arduino-Frequency-Detection
+### [FastLCD](http://fastled.io)
 
-## Hardware Specs
+Use for HSV support with NeoPixels.
 
-### ATtiny85
-
-RAM: 512 bytes
-Flash: 8K (less 2.75K for bootloader leaves about 5.25 KB for user code)
-EEPROM: 512 bytes
-
-5V clock: 16 MHz
-3.3V clock 8 MHz
+Code is on GitHub at [FastLED/FastLED](https://github.com/FastLED/FastLED).
 
 ## Tasks
 
@@ -223,7 +245,7 @@ EEPROM: 512 bytes
 Planning to use an electret ([Adafruit 1935](https://www.adafruit.com/products/1935)) which means either building or buying a preamp. The links below discuss some possible circuits using either transistors or an op amp.
 
 * https://en.wikipedia.org/wiki/Electret_microphone
-* [LM386 microphone amplifier](https://lowvoltage.wordpress.com/2011/05/15/lm386-mic-amp/)
+* [LM386 microphone amplifier](https://lowvoltage.wordpress.com/2011/05/15/lm386-mic-amp/) – this is currently the circuit being used for the input.
 * http://electronics.stackexchange.com/questions/36795/using-a-microphone-with-an-arduino
 * http://electronics.stackexchange.com/questions/53698/how-to-connect-mic-on-arduino-with-opamp
 * http://wiring.org.co/learning/basics/microphone.html
